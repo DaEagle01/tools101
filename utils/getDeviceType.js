@@ -1,11 +1,13 @@
 export const getDeviceType = () => {
-    let width = window.innerWidth;
+    if (typeof window !== 'undefined') {
+        let width = window.innerWidth;
 
-    if (width <= 1024) {
-        return 'mobile';
+        if (width <= 1024) {
+            return 'mobile';
+        }
+        else {
+            return 'desktop';
+        }
     }
-    else {
-        return 'desktop';
-    }
-}
-
+    return "";
+};

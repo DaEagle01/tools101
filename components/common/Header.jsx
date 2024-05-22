@@ -33,7 +33,7 @@ import Cookies from "js-cookie";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { IoIosArrowDown } from "react-icons/io";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -48,6 +48,7 @@ import SearchByImage from "../searchProduct/SearchByImage";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { getDeviceType } from "../../utils/getDeviceType";
 import SearchByVoice from "../searchProduct/SearchByVoice";
+import useDeviceType from "../../hooks/useDeviceType.js";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -59,6 +60,7 @@ function Header() {
   // const totalFavCount = useSelector((state) => state.favourite.favItems.length);
   const dispatch = useDispatch();
   const router = useRouter();
+  const pathname = usePathname();
   const [authToken, setAuthToken] = useState("");
 
   const [searchText, setSearchText] = useState("");
@@ -67,6 +69,7 @@ function Header() {
   const [selectedValue2, setSelectedValue2] = useState("");
   const [selectedValue3, setSelectedValue3] = useState("");
   const [isListening, setIsListening] = useState(false);
+  const deviceType = useDeviceType();
 
   const { data: selectOptions1 } = useGetAllCategoriesQuery();
   const { data: all_sub } = useGetAllSubByCatIdQuery(selectedValue1?.id, {
@@ -79,17 +82,16 @@ function Header() {
     isLoading,
   } = useGetProductCategoriesQuery({ limit: 500 });
 
-  useEffect(() => {
-    dispatch(get());
-  }, [dispatch]);
+  useEffect(() => dispatch(get()), [dispatch]);
+
+  useEffect(() => setAuthToken(Cookies.get("authToken")), []);
+
+  useEffect(() => setDevice(deviceType), [deviceType])
+
+  useEffect(() => setMenuOpen(false), [pathname])
 
   useEffect(() => {
-    setAuthToken(Cookies.get("authToken"));
-    setDevice(getDeviceType())
-  }, []);
-
-  useEffect(() => {
-    router.prefetch("/search-result");
+    router.prefetch("/search-result?text_file=test");
     router.prefetch("/details/a-random-string-id-123-product");
     router.prefetch("/category/1/sub-category/1");
     const productIds = ['2', '3', '4', '6', '10'];
